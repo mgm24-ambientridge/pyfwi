@@ -34,7 +34,7 @@ ISI - takes the wind speed and current FFMC value to produce the current ISI val
 BUI - takes the current DMC and DC values to produce the current BUI value
    - BUI(8.5450511359999997,19.013999999999999) = 8.4904265358371838
 
-FWI - takes the current ISI and BUI values to produce the current BUI value
+FWI - takes the current ISI and BUI values to produce the current FWI value
    - FWI(10.853661073655068,8.4904265358371838) = 10.096371392382368
 
 calcFWI - this function returns the current FWI value given all of the input values: 
