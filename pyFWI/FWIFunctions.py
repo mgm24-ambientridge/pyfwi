@@ -63,13 +63,16 @@ class InvalidLatitude(Exception):
 
 def FFMC(TEMP,RH,WIND,RAIN,FFMCPrev):
     '''Calculates today's Fine Fuel Moisture Code
-Parameters:
+
+    PARAMETERS
+    ----------
     TEMP is the 12:00 LST temperature in degrees celsius
     RH is the 12:00 LST relative humidity in %
     WIND is the 12:00 LST wind speed in kph
     RAIN is the 24-hour accumulated rainfall in mm, calculated at 12:00 LST
     FFMCPrev is the previous day's FFMC
 
+    USAGE:
     FFMC(17,42,25,0,85) = 87.692980092774448'''
 
     RH = min(100.0,RH)
@@ -119,10 +122,11 @@ Parameters:
     return 59.5 * (250.0 - m) / (147.2 + m)
 
 
-
 def DMC(TEMP,RH,RAIN,DMCPrev,LAT,MONTH):
     '''Calculates today's Duff Moisture Code
-Parameters:
+
+    PARAMETERS
+    ----------
     TEMP is the 12:00 LST temperature in degrees celsius
     RH is the 12:00 LST relative humidity in %
     RAIN is the 24-hour accumulated rainfall in mm, calculated at 12:00 LST
@@ -130,6 +134,7 @@ Parameters:
     Lat is the latitude in decimal degrees of the location for which calculations are being made
     Month is the month of Year (1..12) for the current day's calculations.
 
+    USAGE:
     DMC(17,42,0,6,45.98,4) = 8.5450511359999997'''
 
     RH = min(100.0,RH)
@@ -166,16 +171,13 @@ Parameters:
     return DMCPrev + 100.0 * k
 
 
-
 def DC(TEMP,RAIN,DCPrev,LAT,MONTH):
-    '''Calculates today's Drought Code
-Parameters:
+    '''Calculates today's Drought Code Parameters:
     TEMP is the 12:00 LST temperature in degrees celsius
     RAIN is the 24-hour accumulated rainfall in mm, calculated at 12:00 LST
     DCPrev is the previous day's DC
     LAT is the latitude in decimal degrees of the location for which calculations are being made
     MONTH is the month of Year (1..12) for the current day's calculations.
-
     DC(17,0,15,45.98,4) = 19.013999999999999'''
 
     if RAIN > 2.8:
@@ -204,13 +206,15 @@ Parameters:
     return D
 
 
-
 def ISI(WIND,FFMC):
     '''Calculates today's Initial Spread Index
-Parameters:
+
+    PARAMETERS
+    ----------
     WIND is the 12:00 LST wind speed in kph
     FFMC is the current day's FFMC
 
+    USAGE:
     ISI(25,87.692980092774448) = 10.853661073655068'''
 
     fWIND = math.exp(0.05039 * WIND)
@@ -222,13 +226,15 @@ Parameters:
     return 0.208 * fWIND * fF
 
 
-
 def BUI(DMC,DC):
     '''Calculates today's Buildup Index
-Parameters:
+
+    PARAMETERS
+    ----------
     DMC is the current day's Duff Moisture Code
     DC is the current day's Drought Code
 
+    USAGE:
     BUI(8.5450511359999997,19.013999999999999) = 8.4904265358371838'''
 
     if DMC <= 0.4 * DC:
@@ -240,14 +246,17 @@ Parameters:
     return max(U,0.0)
 
 
-
 def FWI(ISI, BUI):
     '''Calculates today's Fire Weather Index
-Paramteres:
+
+    PARAMETERS
+    ----------
     ISI is the current day's ISI
     BUI is the current day's BUI
 
+    USAGE:
     FWI(10.853661073655068,8.4904265358371838) = 10.096371392382368'''
+
     if BUI <= 80.0:
         fD = 0.626 * pow(BUI, 0.809) + 2.0
     else:
@@ -263,7 +272,6 @@ Paramteres:
     return S
 
 
-
 def DryingFactor(Latitude, Month):
 
     LfN = [-1.6, -1.6, -1.6, 0.9, 3.8, 5.8, 6.4, 5.0, 2.4, 0.4, -1.6, -1.6]
@@ -275,7 +283,6 @@ def DryingFactor(Latitude, Month):
         retVal = LfS[Month]
 
     return retVal
-
 
 
 def DayLength(Latitude, MONTH):
@@ -303,8 +310,11 @@ def DayLength(Latitude, MONTH):
     return retVal
 
 def calcFWI(MONTH,TEMP,RH,WIND,RAIN,FFMCPrev,DMCPrev,DCPrev,LAT):
-    '''Caclulates today's FWI
-Parameters:
+    '''Calculates today's FWI
+
+    PARAMETERS
+    ----------
+    MONTH is the numeral month, from 1 to 12
     TEMP is the 12:00 LST temperature in degrees celsius
     RH is the 12:00 LST relative humidity in %
     WIND is the 12:00 LST wind speed in kph
@@ -314,6 +324,7 @@ Parameters:
     DCPrev is the previous day's DC
     LAT is the latitude in decimal degrees of the location for which calculations are being made
 
+    USAGE:
     calcFWI(4,17,42,25,0,85,6,15,45.98) = 10.096371392382368'''
 
     ffmc = FFMC(TEMP,RH,WIND,RAIN,FFMCPrev)
@@ -327,71 +338,55 @@ Parameters:
 
 def LawsonEq1(DMC):
     '''National Standard and Best-fit Non-linear Regression Equations
-Linking DMC to Forest Floor Moisture Content in
-Coastal B.C., Southern Interior B.C. and Southern Yukon
+    Linking DMC to Forest Floor Moisture Content in
+    Coastal B.C., Southern Interior B.C. and Southern Yukon
+    DMC National Standard and Coastal B.C. CWH (2.5-4 cm)^2
 
-DMC National Standard and Coastal B.C. CWH (2.5-4 cm)^2
-
-LawsonEq1(8.5450511359999997)  = 250.7553985454235'''
+    USAGE:
+    LawsonEq1(8.5450511359999997)  = 250.7553985454235'''
 
     return math.exp((DMC-244.7)/-43.4)+20.0
 
 def LawsonEq2(DMC):
     '''National Standard and Best-fit Non-linear Regression Equations
-Linking DMC to Forest Floor Moisture Content in
-Coastal B.C., Southern Interior B.C. and Southern Yukon
+    Linking DMC to Forest Floor Moisture Content in
+    Coastal B.C., Southern Interior B.C. and Southern Yukon
+    Southern Interior B.C.3 (2-4 cm)^2
 
-Southern Interior B.C.3 (2-4 cm)^2
-
-LawsonEq2(8.5450511359999997)  = 194.93023948344205'''
+    USAGE:
+    LawsonEq2(8.5450511359999997)  = 194.93023948344205'''
     return math.exp((DMC-223.9)/-41.7)+20.0
 
 def LawsonEq3(DMC):
     '''National Standard and Best-fit Non-linear Regression Equations
-Linking DMC to Forest Floor Moisture Content in
-Coastal B.C., Southern Interior B.C. and Southern Yukon
+    Linking DMC to Forest Floor Moisture Content in
+    Coastal B.C., Southern Interior B.C. and Southern Yukon
+    Southern Yukon - Pine/White Spruce
+    Feather moss, Sphagnum and Undifferentiated duff (2-4 cm)^2
 
-Southern Yukon - Pine/White Spruce
-Feather moss, Sphagnum and Undifferentiated duff (2-4 cm)^2
-
-LawsonEq3(8.5450511359999997)  = 442.82109267231488'''
+    USAGE:
+    LawsonEq3(8.5450511359999997)  = 442.82109267231488'''
     return math.exp((DMC-157.3)/-24.6)+20
 
 def LawsonEq4(DMC):
     '''National Standard and Best-fit Non-linear Regression Equations
-Linking DMC to Forest Floor Moisture Content in
-Coastal B.C., Southern Interior B.C. and Southern Yukon
+    Linking DMC to Forest Floor Moisture Content in
+    Coastal B.C., Southern Interior B.C. and Southern Yukon
+    Southern Yukon - Pine/White Spruce
+    Reindeer lichen (2-4 cm)^2
 
-Southern Yukon - Pine/White Spruce
-Reindeer lichen (2-4 cm)^2
-
-LawsonEq4(8.5450511359999997)  = 746.02210402093272'''
+    USAGE:
+    LawsonEq4(8.5450511359999997)  = 746.02210402093272'''
     return math.exp((DMC-106.7)/-14.9)+20.0
 
 def LawsonEq5(DMC):
     '''National Standard and Best-fit Non-linear Regression Equations
-Linking DMC to Forest Floor Moisture Content in
-Coastal B.C., Southern Interior B.C. and Southern Yukon
+    Linking DMC to Forest Floor Moisture Content in
+    Coastal B.C., Southern Interior B.C. and Southern Yukon
+    Southern Yukon - White Spruce
+    White spruce/feather moss (2-4 cm)^2
 
-Southern Yukon - White Spruce
-White spruce/feather moss (2-4 cm)^2
-
-LawsonEq5(8.5450511359999997)  = 853.2397847094652'''
+    USAGE:
+    LawsonEq5(8.5450511359999997)  = 853.2397847094652'''
 
     return math.exp((DMC-149.6)/-20.9)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
